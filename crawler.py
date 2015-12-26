@@ -10,15 +10,19 @@ def getHtml(url):
     return html
 
 
+# def getInfo(html):
+
+
 html = getHtml("http://kaijiang.zhcw.com/zhcw/html/ssq/list_1.html")
 
-m = re.search("<tr>.*</tr>", html, re.I | re.M | re.S)
+list = re.findall(r'<tr>.*?<em.*?</tr>', html, re.I | re.M | re.S)
 
-if m:
-    print "m.groups() : ", m.groups()
-    print "m.group(1) : ", m.group()
-    # print "m.group(2) : ", m.group(2)
-else:
-    print "No match!!"
+i = 0
+for val in list:
+    i += 1
+    # print str(i) + ':'
+    print val
 
 
+# pattern = re.compile(r'(<td.*?>?P<date></td>)\s+(<td.*?>?P<no></td>)\s+.*', re.I)
+# m=p.search(s)
