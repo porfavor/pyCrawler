@@ -76,3 +76,11 @@ print m.group()
 print m.groups()
 print m.group('name')
 print m.group('num')
+
+
+
+a = u"这是个中文"
+b = re.compile(u"[\u4e00-\u9fa5]{1,2}")
+c = b.findall(a)
+for i in  c:
+    print i
