@@ -75,7 +75,7 @@ def get_top_scored_red():
     cursor = db.cursor()
     # SQL 更新语句
     sql = '''
-            SELECT number,score FROM {0} ORDER BY not_appear DESC limit {1};
+            SELECT number,score FROM {0} ORDER BY score DESC limit {1};
         '''.format('t_appear_red', 17)
     # print 'sql: '
     # print sql
@@ -85,7 +85,7 @@ def get_top_scored_red():
 
     rows = cursor.fetchall()
     for row in rows:
-        if row[1] > rows[0][1]/3:
+        if row[1] >= float(rows[0][1])/3:
             # print row
             res.append(row[0])
 
@@ -102,8 +102,8 @@ def get_top_scored_blue():
     cursor = db.cursor()
     # SQL 更新语句
     sql = '''
-            SELECT number,score FROM {0} ORDER BY not_appear DESC limit {1};
-        '''.format('t_appear_blue', 3)
+            SELECT number,score FROM {0} ORDER BY score DESC limit {1};
+        '''.format('t_appear_blue', 5)
     # print 'sql: '
     # print sql
 
@@ -113,7 +113,9 @@ def get_top_scored_blue():
     rows = cursor.fetchall()
     for row in rows:
         # print row
-        res.append(row[0])
+        if row[1] >= float(rows[0][1])*5/12:
+            # print row
+            res.append(row[0])
 
     #print rows
     return res

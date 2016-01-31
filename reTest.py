@@ -1,6 +1,3 @@
 #!/usr/bin/python
-from utils import Utils
 
-a = Utils()
-
-a.printMe()
+print float(39)/2

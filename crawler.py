@@ -150,6 +150,7 @@ def get_next_page_num(text):
 while True:
     print 'Process page [' + str(page_num) + ']: '
     html = get_html(web_address + url + str(page_num))
+
     records = re.findall(r'<tr>.*?<em.*?</tr>', html, re.I | re.M | re.S)
 
     for record in records:
