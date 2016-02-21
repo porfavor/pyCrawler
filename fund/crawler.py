@@ -6,9 +6,9 @@ import traceback
 import MySQLdb
 
 global web_address, url, page_num
-web_address = 'http://kaijiang.zhcw.com'
-url = '/zhcw/inc/ssq/ssq_wqhg.jsp?pageNum='
-page_num = 1
+web_address = 'http://quotes.money.163.com'
+uri = '/fund/jzzs_{0}_{1}.html?start={2}&end={3}&sort=TDATE&order=desc'
+page_num = 0
 
 
 def get_html(url):
@@ -24,7 +24,7 @@ def get_record_fields(rec):
 
     # 2. search for fields in <td></td>
     pattern = re.compile(
-            r'.*?<td.*?>(?P<date>.+?)</td>\s*?<td.*?>(?P<number>.+?)</td>\s*?<td.*?>(?P<balls>.+?)</td>\s*?<td.*?>(?P<prize2>.+?)</td>\s*?<td.*?>(?P<prize1>.+?)</td>.*',
+            r'.*?<td.*?>(?P<date>.+?)</td>\s*?<td.*?>(?P<fund_nuv>.+?)</td>\s*?<td.*?>(?P<fund_nav>.+?)</td>\s*?<td.*?><span class=\"\w*?\">(?P<growth_rate>.+?)%</span></td>.*',
             re.I | re.M | re.S)
     m = pattern.search(sub_text)
 
@@ -33,41 +33,11 @@ def get_record_fields(rec):
         return
 
     date = m.group('date')
-    number = m.group('number')
-    balls = m.group('balls')
-    prize1 = m.group('prize1')
-    prize2 = m.group('prize2')
-    # print date, number, balls, prize1, prize2
+    fund_nuv = m.group('fund_nuv')
+    fund_nav = m.group('fund_nav')
+    growth_rate = m.group('growth_rate')
 
-    # 3. search for data in <em></em>
-    pattern = re.compile(
-            r'<em.*?>(?P<ball1>.+?)</em><em.*?>(?P<ball2>.+?)</em><em.*?>(?P<ball3>.+?)</em><em.*?>(?P<ball4>.+?)</em><em.*?>(?P<ball5>.+?)</em><em.*?>(?P<ball6>.+?)</em><em>(?P<ball7>.+?)</em>',
-            re.I | re.M | re.S)
-    # print pattern.groupindex
-    m2 = pattern.search(balls)
-    if not m2:
-        print 'No match!'
-        return
-
-    # print pattern.groups()
-    red = m2.group('ball1') + ',' + m2.group('ball2') + ',' + m2.group('ball3') + ',' + m2.group(
-            'ball4') + ',' + m2.group('ball5') + ',' + m2.group('ball6')
-    blue = m2.group('ball7')
-
-    pattern = re.compile(r'<strong>(?P<prize>.+?)</strong>.*', re.I | re.M | re.S)
-    m2 = pattern.search(prize1)
-    if not m2:
-        print 'No match!'
-        return
-    prize1 = m2.group('prize')
-
-    m2 = pattern.search(prize2)
-    if not m2:
-        print 'No match!'
-        return
-    prize2 = m2.group('prize').replace(',', '')
-
-    result = {'date': date, 'number': number, 'red': red, 'blue': blue, 'prize1': prize1, 'prize2': prize2}
+    result = {'date': date, 'fund_nuv': fund_nuv, 'fund_nav': fund_nav, 'growth_rate': growth_rate}
     return result
 
 
@@ -149,19 +119,26 @@ def get_next_page_num(text):
 # main start
 while True:
     print 'Process page [' + str(page_num) + ']: '
-    html = get_html(web_address + url + str(page_num))
+    url = (web_address + uri).format(162411, page_num, '2011-09-29', '2016-02-20')
+    print 'url: ' + url
+    html = get_html(url)
+    # print html
 
-    records = re.findall(r'<tr>.*?<em.*?</tr>', html, re.I | re.M | re.S)
+
+    records = re.findall(r'<tr>.*?<span.*?</tr>', html, re.I | re.M | re.S)
 
     for record in records:
+        #print record
         recDict = get_record_fields(record)
-        save_to_db(recDict)
+        # save_to_db(recDict)
         print 'Save record to db: ' + str(recDict)
 
-    next_page = get_next_page_num(html)
-    if page_num == next_page:
-        break
-    else:
-        page_num = next_page
+    # next_page = get_next_page_num(html)
+    # if page_num == next_page:
+    #     break
+    # else:
+    #     page_num = next_page
+
+    break
 
 print '========== FINISH PROCESS HTML =========='
